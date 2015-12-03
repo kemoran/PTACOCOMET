@@ -1,0 +1,108 @@
+{% extends 'BaseSistemaWeb.html' %}
+
+{% block CSS %}
+{% endblock %}
+
+{% block Contenido %}
+					<div class="row">
+						<div class="col-md-12">
+							<div class="box box-success">
+								<div class="box-header with-border"> <h3> Agregar ejecutivo </h3> </div>
+								<form role="form" method="post">
+									<div class="box-body">
+										<p class="text-danger"> {{ Mensaje }} </p>
+										{% csrf_token %}
+										<fieldset>
+											<legend> Datos generales del ejecutivo </legend>
+											<div class="form-group">
+												<label> Nombres </label>
+												{{ ifrmAgregarEjecutivo.nombre }}
+												<span class="text-danger"> {{ ifrmAgregarEjecutivo.nombre.errors }} </span>
+											</div>
+											<div class="form-group">
+												<label> Apellidos </label>
+												{{ ifrmAgregarEjecutivo.apellido }}
+												<span class="text-danger"> {{ ifrmAgregarEjecutivo.apellido.errors }} </span>
+											</div>
+											<div class="form-group">
+												<label> Documento &uacute;nico de identidad </label>
+												{{ ifrmAgregarEjecutivo.dui }}
+												<span class="text-danger"> {{ ifrmAgregarEjecutivo.dui.errors }} </span>
+											</div>
+											<div class="form-group">
+												<label> N&uacute;mero identificaci&oacute;n tributaria </label>
+												{{ ifrmAgregarEjecutivo.nit }}
+												<span class="text-danger"> {{ ifrmAgregarEjecutivo.nit.errors }} </span>
+											</div>
+
+											<!-- Genero del ejecutivo -->
+											<div class="form-group">
+												<label> G&eacute;nero </label>
+												<div class="radio">
+													<label> {{ ifrmAgregarEjecutivo.genero.0.tag }} Masculino </label>
+												</div>
+												<div class="radio">
+													<label> {{ ifrmAgregarEjecutivo.genero.1.tag }} Femenino </label>
+												</div>
+												<span class="text-danger"> {{ ifrmAgregarEjecutivo.genero.errors }} </span>
+											</div>
+
+											<div class="form-group">
+												<label> N&uacute;mero de tel&eacute;fono </label>
+												{{ ifrmAgregarEjecutivo.telefono }}
+												<span class="text-danger"> {{ ifrmAgregarEjecutivo.telefono.errors }} </span>
+											</div>
+											<div class="form-group">
+												<label> Correo electr&oacute;nico </label>
+												{{ ifrmAgregarEjecutivo.correo_electronico }}
+												<span class="text-danger"> {{ ifrmAgregarEjecutivo.correo_electronico.errors }} </span>
+											</div>
+										</fieldset>
+
+										<fieldset>
+											<legend> Datos de cuenta de usuario </legend>
+											<div class="form-group">
+												<label> Apodo del usuario </label>
+												{{ ifrmAgregarEjecutivo.apodo_usuario }}
+												<span class="text-danger"> {{ ifrmAgregarEjecutivo.apodo_usuario.errors }} {{ Mensaje }} </span>
+											</div>
+											<div class="form-group">
+												<label> Contrase&ntilde;a </label>
+												{{ ifrmAgregarEjecutivo.contrasenha_usuario }}
+												<span class="text-danger"> {{ ifrmAgregarEjecutivo.contrasenha_usuario.errors }} </span>
+											</div>
+										</fieldset>
+									</div>
+									<div class="box-footer">
+										<button id="btnSiguiente" class="btn btn-primary"> Agregar </button>
+										<a class="btn btn-default" data-toggle="modal" href="#mdCancelar"> Cancelar </a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!-- Modal cancelar -->
+					<div class="modal fade" id="mdCancelar" tabindex="-1" role="dialog" aria-labelledby="ModalCancelar" aria-hidden="true">
+						<div class="modal-dialog modal-sm">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+									<h4 class="modal-title" id="ModalCancelar">
+										<span class="glyphicon glyphicon-warning-sign"></span> Alerta
+									</h4>
+								</div>
+								<div class="modal-body">
+									<h4> ¿Seguro que desea cancelar? </h4>
+								</div>
+								<div class="modal-footer">
+									<a class="btn btn-default" href="{% url 'PasaTurnos.views.ConsultarEjecutivo' %}">
+										<span class="glyphicon glyphicon-ok"></span> <!-- Si -->
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+{% endblock %}
+
+{% block JSli %}
+{% endblock %}

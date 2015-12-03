@@ -1,0 +1,59 @@
+{% extends 'BaseRegistroyAcceso.html' %}
+
+{% block CSS %}
+{% endblock %}
+
+{% block Contenido %}
+			<div class="login-box">
+				<div class="login-logo">
+					<a href="../../index2.html"><b>Admin</b>LTE</a>
+				</div><!-- /.login-logo -->
+				<div class="login-box-body">
+					<p class="login-box-msg"> Registrar datos de la empresa </p>
+					<form method="post">
+						{% csrf_token %}
+						<div class="form-group has-feedback">
+							{{ ifrmAgregarEmpresa.nombre }}
+							<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+						</div>
+						<span class="text-danger"> {{ ifrmAgregarEmpresa.nombre.errors }} </span>
+						<div class="form-group has-feedback">
+							{{ ifrmAgregarEmpresa.numero_registro }}
+							<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+						</div>
+						<span class="text-danger"> {{ ifrmAgregarEmpresa.numero_registro.errors }} </span>
+						<div class="form-group has-feedback">
+							{{ ifrmAgregarEmpresa.telefono }}
+							<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+						</div>
+						<span class="text-danger"> {{ ifrmAgregarEmpresa.telefono.errors }} </span>
+						<div class="form-group has-feedback">
+							{{ ifrmAgregarEmpresa.fax }}
+							<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+						</div>
+						<span class="text-danger"> {{ ifrmAgregarEmpresa.fax.errors }} </span>
+						<div class="form-group has-feedback">
+							{{ ifrmAgregarEmpresa.direccion }}
+							<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+						</div>
+						<span class="text-danger"> {{ ifrmAgregarEmpresa.direccion.errors }} </span>
+						<div class="form-group has-feedback">
+							{{ ifrmAgregarEmpresa.correo_electronico }}
+							<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+						</div>
+						<span class="text-danger"> {{ ifrmAgregarEmpresa.correo_electronico.errors }} </span>
+						<div class="form-group has-feedback">
+							{{ ifrmAgregarEmpresa.sitio_web }}
+							<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+						</div>
+						<span class="text-danger"> {{ ifrmAgregarEmpresa.sitio_web.errors }} </span>
+						<div class="row">
+							<div class="col-xs-12">
+								<button type="submit" class="btn btn-primary btn-block btn-flat"> Registrar </button>
+							</div><!-- /.col -->
+						</div>
+					</form>
+
+				</div><!-- /.login-box-body -->
+			</div><!-- /.login-box -->
+{% endblock %}

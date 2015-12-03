@@ -1,0 +1,109 @@
+{% extends 'BaseSistemaWeb.html' %}
+{% load staticfiles %}
+
+{% block CSS %}
+		<!-- DataTables -->
+		<link rel="stylesheet" href="{% static 'AdminLTE/plugins/datatables/dataTables.bootstrap.css' %}">
+{% endblock %}
+
+{% block Contenido %}
+					<div class="row">
+						<div class="col-md-12">
+							<div class="box box-success">
+								<div class="box-header with-border"> <h3> Listado de cajeros </h3> </div>
+								<form role="form">
+									<div class="box-body">
+										<table id="tblCajeros" class="table table-bordered table-striped">
+											<thead>
+												<tr>
+													<th style="width:10%;"> Nombre </th>
+													<th style="width:10%;"> Apellido </th>
+													<th style="width:14%;"> Documento &uacute;nico de identidad </th>
+													<th style="width:14%;"> N&uacute;mero de identificaci&oacute;n tributaria </th>
+													<th style="width:10%;"> G&eacute;nero </th>
+													<th style="width:10%;"> Tel&eacute;fono </th>
+													<th style="width:15%;"> Correo electr&oacute;nico </th>
+													<th style="width:17%;"> Mantenimiento </th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for i in iCajero %}
+												<tr>
+													<td> {{i.nombre}} </td>
+													<td> {{i.apellido}} </td>
+													<td> {{i.dui}} </td>
+													<td> {{i.nit}} </td>
+													
+													<!-- Genero del cajero -->
+													<td>
+													{% if i.genero == 'M' %}
+														Masculino
+													{% else %}
+														Femenino
+													{% endif %}
+													<!-- Fin genero del cajero -->
+
+													<td> {{i.telefono}} </td>
+													<td> {{i.correo_electronico}} </td>
+													<td>
+														<a class="btn btn-warning" href="{% url 'PasaTurnos.views.EditarCajero' i.id %}">
+															<!-- Editar -->
+															<span class="glyphicon glyphicon-pencil"></span>
+														</a>
+														<button class="btn btn-danger" id="btnEliminar" value="{{i.id}}" type="button">
+															<!-- Eliminar -->
+															<span class="glyphicon glyphicon-trash"></span>
+														</button>
+													</td>
+												</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+									<div class="box-footer">
+										<a href="{% url 'PasaTurnos.views.AgregarCajero' %}" class="btn btn-primary"> Agregar cajero </a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!-- Modal Eliminar -->
+					<div class="modal fade fade bs-example-modal-sm" id="mdEliminar" tabindex="-1" role="dialog" aria-labelledby="ModalEliminar" aria-hidden="true">
+						<div class="modal-dialog modal-sm">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+									<h4 class="modal-title" id="ModalEliminar">
+										<span class="glyphicon glyphicon-warning-sign"></span> Alerta
+									</h4>
+								</div>
+								<div class="modal-body">
+									<h4> ¿Seguro que desea eliminar? </h4>
+								</div>
+								<div class="modal-footer">
+									<!-- <button type="button" class="btn btn-default" data-dismiss="modal"> No </button> -->
+									<a id="mdEliminarbtnSi" class="btn btn-danger" href="#"> <!-- Si --> <span class="glyphicon glyphicon-ok"></span> </a>
+								</div>
+							</div>
+						</div>
+					</div>
+{% endblock %}
+
+{% block JSli %}
+		<!-- DataTables -->
+		<script src="{% static 'AdminLTE/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+		<script src="{% static 'AdminLTE/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
+{% endblock %}
+
+{% block JS %}
+		<script type="text/javascript">
+			$("#tblCajeros").DataTable();
+			$(document).ready(function(){
+				$(document).on("click", "#btnEliminar", function(e){
+					var url = "/AdmonSistema/AdmonUsuarios/Cajero/Eliminar/"+ $(this).val();
+					$("#mdEliminarbtnSi").attr("href", url);
+					$("#mdEliminar").modal("show");
+				});
+			});
+		</script>
+{% endblock %}

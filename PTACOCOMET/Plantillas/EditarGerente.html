@@ -1,0 +1,71 @@
+{% extends 'BaseSistemaWeb.html' %}
+
+{% block CSS %}
+{% endblock %}
+
+{% block Contenido %}
+					<div class="row">
+						<div class="col-md-12">
+							<div class="box box-success">
+								<div class="box-header with-border"> <h3> Editar gerente </h3> </div>
+								<form role="form" method="post">
+									<div class="box-body">
+										<p class="text-danger"> {{ Mensaje }} </p>
+										{% csrf_token %}
+										<fieldset>
+											<legend> Datos generales del gerente </legend>
+											<div class="form-group">
+												<label> Nombres </label>
+												{{ ifrmEditarGerente.nombre }}
+												<span class="text-danger"> {{ ifrmEditarGerente.nombre.errors }} </span>
+											</div>
+											<div class="form-group">
+												<label> Apellidos </label>
+												{{ ifrmEditarGerente.apellido }}
+												<span class="text-danger"> {{ ifrmEditarGerente.apellido.errors }} </span>
+											</div>
+											<div class="form-group">
+												<label> N&uacute;mero de tel&eacute;fono </label>
+												{{ ifrmEditarGerente.telefono }}
+												<span class="text-danger"> {{ ifrmEditarGerente.telefono.errors }} </span>
+											</div>
+											<div class="form-group">
+												<label> Correo electr&oacute;nico </label>
+												{{ ifrmEditarGerente.correo_electronico }}
+												<span class="text-danger"> {{ ifrmEditarGerente.correo_electronico.errors }} </span>
+											</div>
+										</fieldset>
+									</div>
+									<div class="box-footer">
+										<button id="btnSiguiente" class="btn btn-warning"> Editar </button>
+										<a class="btn btn-default" data-toggle="modal" href="#mdCancelar"> Cancelar </a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!-- Modal cancelar -->
+					<div class="modal fade" id="mdCancelar" tabindex="-1" role="dialog" aria-labelledby="ModalCancelar" aria-hidden="true">
+						<div class="modal-dialog modal-sm">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+									<h4 class="modal-title" id="ModalCancelar">
+										<span class="glyphicon glyphicon-warning-sign"></span> Alerta
+									</h4>
+								</div>
+								<div class="modal-body">
+									<h4> ¿Seguro que desea cancelar? </h4>
+								</div>
+								<div class="modal-footer">
+									<a class="btn btn-default" href="{% url 'PasaTurnos.views.ConsultarGerente' %}">
+										<span class="glyphicon glyphicon-ok"></span> <!-- Si -->
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+{% endblock %}
+
+{% block JSli %}
+{% endblock %}

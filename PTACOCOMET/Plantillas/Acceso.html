@@ -1,0 +1,35 @@
+{% extends 'BaseRegistroyAcceso.html' %}
+{% load staticfiles %}
+{% block CSS %}
+{% endblock %}
+
+{% block Contenido %}
+			<div class="login-box">
+				<div class="login-logo">
+					<a href="{% url 'PasaTurnos.views.Sistema' %}"> <img src="{% static 'SysWeb/ACOCOMET-brand.PNG' %}" alt="ACOCOMET"> <b> ACOCOMET </b> </a>
+				</div><!-- /.login-logo -->
+				<div class="login-box-body">
+					<p class="login-box-msg"> Ingrese al sistema </p>
+					<form method="post">
+						{% csrf_token %}
+						<div class="form-group has-feedback">
+							<input type="text" class="form-control" name="username" placeholder="Nombre de usuario">
+							<span class="glyphicon glyphicon-user form-control-feedback"></span>
+						</div>
+						<div class="form-group has-feedback">
+							<input type="password" class="form-control" name="password" placeholder="Contraseña">
+							<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+						</div>
+						<p class="text-danger"> {{ Mensaje }} </p>
+						<div class="row">
+							<div class="col-xs-12">
+								<button type="submit" class="btn btn-primary btn-block btn-flat"> Ingresar </button>
+								<a href="{% url 'PasaTurnos.views.PantallaAsignacion' %}" class="btn btn-primary btn-block btn-flat"> Pantalla de llamada </a>
+								<a href="{% url 'PasaTurnos.views.PantallaGeneradoraTicket' %}" class="btn btn-primary btn-block btn-flat"> Pantalla generadora de ticket </a>
+							</div><!-- /.col -->
+						</div>
+					</form>
+
+				</div><!-- /.login-box-body -->
+			</div><!-- /.login-box -->
+{% endblock %}

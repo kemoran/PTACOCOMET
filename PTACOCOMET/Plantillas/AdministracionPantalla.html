@@ -1,0 +1,118 @@
+{% extends 'BaseSistemaWeb.html' %}
+{% load staticfiles %}
+
+{% block CSS %}
+		<!-- DataTables -->
+		<link rel="stylesheet" href="{% static 'AdminLTE/plugins/datatables/dataTables.bootstrap.css' %}">
+{% endblock %}
+
+{% block Contenido %}
+					<div class="row">
+						<div class="col-md-9">
+							<div class="box box-success">
+								<div class="box-header with-border"> <h3> Listado de videos </h3> </div>
+								<form role="form">
+									<div class="box-body">
+										<table id="tblVideos" class="table table-bordered table-striped">
+											<thead>
+												<tr>
+													<th> Video </th>
+													<th style="width:35%;"> Descripci&oacute;n </th>
+													<th style="width:10%;"> Mantenimiento </th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for i in iVideo %}
+												<tr>
+													<td>
+														<div align="center" class="embed-responsive embed-responsive-16by9">
+															<video controls class="embed-responsive-item">
+																<source src="{{ MEDIA_URL }}{{ i.ruta }}" type="video/webm">
+															</video>
+														</div>
+													</td>
+													<td> {{ i.descripcion }} </td>
+													<td>
+														<button class="btn btn-danger" id="btnEliminar" value="{{i.id}}">
+															<!-- Eliminar -->
+															<span class="glyphicon glyphicon-trash"></span>
+														</button>
+													</td>
+												</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+									{% comment %}
+									<div class="box-footer">
+										<a href="{% url 'PasaTurnos.views.AgregarVideo' %}" class="btn btn-primary"> Agregar video </a>
+									</div>
+									{% endcomment %}
+								</form>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="box box-success">
+								<div class="box-header with-border"> <h3> Agregar video </h3> </div>
+								<form role="form" method='post' enctype="multipart/form-data">
+									<div class="box-body">
+										<p class="text-danger"> {{ Mensaje }} </p>
+										{% csrf_token %}
+										<div class="form-group">
+											<label> Video </label>
+											{{ ifrmVideo.ruta }}
+											<span class="text-danger"> {{ ifrmVideo.ruta.errors }} </span>
+										</div>
+										<div class="form-group">
+											<label> Descripcion </label>
+											{{ ifrmVideo.descripcion }}
+											<span class="text-danger"> {{ ifrmVideo.descripcion.errors }} </span>
+										</div>
+									</div>
+									<div class="box-footer">
+										<button id="btnSiguiente" class="btn btn-primary"> Agregar </button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!-- Modal Eliminar -->
+					<div class="modal fade fade bs-example-modal-sm" id="mdEliminar" tabindex="-1" role="dialog" aria-labelledby="ModalEliminar" aria-hidden="true">
+						<div class="modal-dialog modal-sm">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+									<h4 class="modal-title" id="ModalEliminar">
+										<span class="glyphicon glyphicon-warning-sign"></span> Alerta
+									</h4>
+								</div>
+								<div class="modal-body">
+									<h4> ¿Seguro que desea eliminar? </h4>
+								</div>
+								<div class="modal-footer">
+									<!-- <button type="button" class="btn btn-default" data-dismiss="modal"> No </button> -->
+									<a id="mdEliminarbtnSi" class="btn btn-danger" href="#"> <!-- Si --> <span class="glyphicon glyphicon-ok"></span> </a>
+								</div>
+							</div>
+						</div>
+					</div>
+{% endblock %}
+
+{% block JSli %}
+		<!-- DataTables -->
+		<script src="{% static 'AdminLTE/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+		<script src="{% static 'AdminLTE/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
+{% endblock %}
+
+{% block JS %}
+		<script type="text/javascript">
+			$("#tblVideos").DataTable();
+			$(document).ready(function(){
+				$(document).on("click", "#btnEliminar", function(e){
+					var url = "/AdministracionPantalla/Video/Eliminar/"+ $(this).val();
+					$("#mdEliminarbtnSi").attr("href", url);
+					$("#mdEliminar").modal("show");
+				});
+			});
+		</script>
+{% endblock %}

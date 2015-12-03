@@ -1,0 +1,359 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="es-sv">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title> SISTEMA DE GESTIÓN DE TURNOS ACOCOMET DE R.L. </title>
+
+		<!-- CSS de Bootstrap -->
+		<link rel="stylesheet" type="text/css" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'Bootstrap/css/jumbotron-narrow.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'Bootstrap/css/bootstrap-datetimepicker.css' %}">
+		
+		<!-- Just for debugging purposes. Don't actually copy this line! -->
+		<!--[if lt IE 9]><script src="{% static 'Boostrap/js/ie8-responsive-file-warning.js' %}"></script><![endif]-->
+
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+			<script src="{% static 'Boostrap/js/html5shiv.js' %}"></script>
+			<script src="{% static 'Boostrap/js/respond.min.js' %}"></script>
+		<![endif]-->
+
+	</head>
+	<body style="padding: 10px;">
+		<div class="row">
+			<div class="col-md-4">
+				<div class="row">
+					<div class="col-md-12">
+						<!-- Información de ACOCOMET -->
+						<img class="img-responsive center-block" src="{% static 'SysWeb/ACOCOMET-thumbnail.PNG' %}"> <h1 class="text-center"> ACOCOMET DE R. L. </h1>
+						<h4 class="text-center"> Tu Cooperatíva amiga </h4>
+						<br>
+						<p>
+							Selecciona el servicio por el cual deseas ser atendido e ingresa tu número de DUI para personalizar tu ticket (Debes registrarte para que muestre tu nombre),
+							Recuerda <strong> que no es obligatorio que ingreses tu número de DUI. </strong>
+							Toma tu ticket y puedes esperar a que tu número de turno sea asignado a un cajero o ventanilla según el servicio que has seleccionado.
+						</p>
+						<br>
+						<div style="display: inline-block">
+							<p class="text-muted">
+								Desarrollado por:
+							</p>
+							<a href="http://www.catolica.edu.sv">
+								<img class="img-thumbnail" src="{% static 'SysWeb/UNICAES-thumbnail.PNG' %}">
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-md-12">
+						<h1 class="text-center"> Seleccione uno de los servicios </h1>
+					</div>
+					{% for i in iServicio %}
+					<div class="col-xs-6 col-sm-3">
+						<p>
+							<button id="btnImprimir" class="btn btn-success" value="{{ i.id }}">
+								{{ i.descripcion }}
+							</button>
+						</p>
+					</div>
+					{% endfor %}
+				</div>
+				<!-- Fin de Asignación de ticket -->
+			</div>
+		</div>
+
+		<!-- Modal Seleccionar servicio -->
+		<div class="modal fade fade bs-example-modal-sm" id="mdSeleccionar" tabindex="-1" role="dialog" aria-labelledby="ModalSeleccionar" aria-hidden="true">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="ModalSeleccionar">
+							<span class="glyphicon glyphicon-user"></span> Identificaci&oacute;n de cliente
+						</h4>
+					</div>
+					<div class="modal-body">
+						<div class="alert alert-info">
+							<!--
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							-->
+							No es obligatorio identificar el cliente para imprimir ticket
+						</div>
+						<div id="alSusccess"></div>
+						<form role="form" id="frmIdenDuiCliente">
+							<div class="form-group">
+								<label> N&uacute;mero de DUI del cliente </label>
+								<input type="text" class="form-control" id="txtDUI" name="txtDUI" placeholder="00000000-0">
+								<span class="text-danger" id="errIdenDuiCliente"> </span>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button id="mdImprimir" class="btn btn-primary" value=""> Imprimir </button>
+						<a class="btn btn-default pull-left" data-toggle="modal" href="#mdRegistrarCliente"> Registrar </a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal Registrar cliente -->
+		<div class="modal fade" id="mdRegistrarCliente" tabindex="-1" role="dialog" arial-labelledby="ModalRegistrarCliente" aria-hidden="true">
+			<div class="modal-dialog">
+				<!-- Contenido del modal -->
+				<div class="modal-content">
+					<!-- Cabecera del modal -->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4>
+							<span class="glyphicon glyphicon-list-alt"></span> Registrar de cliente
+						</h4>
+					</div>
+					<!-- Cuerpo del modal -->
+					<div class="modal-body">
+						<form class="form-horizontal" role="form" method="post" id="frmAgregarCliente">
+							{% csrf_token %}
+							<div class="form-group">
+								<label class="col-lg-2 control-label"> Nombres </label>
+								<div class="col-lg-10">
+									{{ ifrmAgregarCliente.nombre }}
+									<span class="text-danger" id="errNombreCliente"> </span>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 control-label"> Apellidos </label>
+								<div class="col-lg-10">
+									{{ ifrmAgregarCliente.apellido }}
+									<span class="text-danger" id="errApellidoCliente"> </span>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 control-label"> Documento &Uacute;nico de identidad </label>
+								<div class="col-lg-10">
+									{{ ifrmAgregarCliente.dui }}
+									<span class="text-danger" id="errDuiCliente"> </span>
+								</div>
+							</div>
+
+							<!-- Genero -->
+							<div class="form-group">
+								<label class="col-lg-2 control-label"> G&eacute;nero </label>
+								<div class="col-lg-10">
+									<label class="radio-inline">
+										{{ ifrmAgregarCliente.genero.0.tag }} Masculino
+									</label>
+
+									<label class="radio-inline">
+										{{ ifrmAgregarCliente.genero.1.tag }} Femenino
+									</label>
+									<br>
+									<span class="text-danger" id="errGeneroCliente"> </span>
+								</div>
+							</div>
+
+							<!-- Fecha de nacimiento -->
+							<div class="form-group">
+								<label class="col-lg-2 control-label"> Fecha de nacimiento </label>
+								<div class="col-lg-10">
+									<div class="input-group date" id="dpFechaNacimiento">
+										{{ ifrmAgregarCliente.fecha_nacimiento }}
+										<span class="input-group-addon">
+											<span class="glyphicon glyphicon-calendar">
+										</span>
+									</div>
+									<span class="text-danger" id="errFechaCliente"> </span>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 control-label"> Tel&eacute;fono </label>
+								<div class="col-lg-10">
+									{{ ifrmAgregarCliente.telefono }}
+									<span class="text-danger" id="errTelefonoCliente"> </span>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-2 control-label"> Correo electr&oacute;nico </label>
+								<div class="col-lg-10">
+									{{ ifrmAgregarCliente.correo_electronico }}
+									<span class="text-danger" id="errCorreoECliente"> </span>
+								</div>
+							</div>
+							
+							<!--
+							<div class="form-group">
+								<div class="col-lg-offset-2 col-lg-10">
+									<button class="btn btn-primary" type="submit">
+										<span class="glyphicon glyphicon-ok"></span>
+									</button>
+								</div>
+							</div>
+							-->
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button id="btnRegistrar" class="btn btn-primary" value="">
+							<span class="glyphicon glyphicon-ok"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- JS de Bootstrap y JQuery necesario para su funcionamiento -->
+		<script type="text/javascript" src="{% static 'Bootstrap/js/jquery.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'Bootstrap/js/bootstrap.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'Bootstrap/js/jquery.cookie.js' %}"></script>
+		<script type="text/javascript" src="{% static 'Bootstrap/js/moment.js' %}"></script>
+		<script type="text/javascript" src="{% static 'Bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+		<script type="text/javascript" src="{% static 'Bootstrap/js/bootstrap-datetimepicker.es.js' %}"></script>
+
+		<script type="text/javascript">
+			
+			$(document).ready(function(){
+				
+				// Impresion de ticket
+				var url = "";
+				$(document).on("click", "#btnImprimir", function(e){
+					url = "/PantallaGeneradoraTicket/GeneradordeTicket/"+ $(this).val();
+					$("#mdImprimir").attr("value", url);
+					$("#mdSeleccionar").modal("show");
+				});
+				$(document).on("click", "#mdImprimir", function(e){
+					$("#errIdenDuiCliente").html("");
+					var dui = $("#txtDUI").val();
+					if (dui == ''){
+						window.open(url+"/"+"00000000-0", "_blank");
+					}
+					else{
+						$.ajax({
+							url: "/Ajax/IdentificarClienteAjaxPGT/"+dui,
+							data: dui,
+							type: "GET",
+							success: function(data){
+								/* Proceso */
+								if (data.success){
+									/* Proceso */
+									$("#frmIdenDuiCliente").get(0).reset();
+									$("#mdSeleccionar").modal("hide");
+									window.open(url+"/"+dui, "_blank");
+								}
+								else{
+									/* Proceso */
+									if (data.errors){
+										$("#errIdenDuiCliente").html(data.errors);
+									}
+								}
+							},
+							error: function(jqXHR, textStatus, errorThrown){
+								alert(textStatus + " " +errorThrown);
+							},
+							processData: false,
+							contentType: false
+						})
+					}
+				});
+
+				/* Datepicker */
+				$("#dpFechaNacimiento").datetimepicker({
+					pickTime: false,
+					language: "es",
+					showToday: true
+				});
+
+				/* Fecha de minima y maxima ej "july 4, 2014" */
+				var Mes = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+				var Ahora = new Date();
+
+				
+				$("#dpFechaNacimiento").data("DateTimePicker").setMinDate(
+					Mes[Ahora.getMonth()]+" "+(Ahora.getDay()+1)+", "+(Ahora.getFullYear()-99)
+					);
+				
+				$("#dpFechaNacimiento").data("DateTimePicker").setMaxDate(
+					Mes[Ahora.getMonth()]+" "+(Ahora.getDay()+1)+", "+Ahora.getFullYear()
+					);
+
+				/*
+				$("#frmAgregarCliente").bind("submit", function(e){
+					e.preventDefault();
+				*/
+				$(document).on("click", "#btnRegistrar", function(e){
+					$("#errDuiCliente").html("");
+
+					/* Convierto la fecha a formato de MySQL */
+					var FechaNacimiento = $("#id_fecha_nacimiento").val();
+					var NFechaNacimiento = FechaNacimiento.split("/").reverse().join("-");
+					$("#id_fecha_nacimiento").val(NFechaNacimiento);
+
+					var fdfrmAgregarCliente = new FormData(document.getElementById("frmAgregarCliente"));
+					$.ajax({
+						url: "{% url 'PasaTurnos.views.AgregarClienteAjaxPGT' %}",
+						data: fdfrmAgregarCliente,
+						type: "POST",
+						success: function(data){
+							/* Proceso */
+							if (data.success){
+								/* Proceso */
+								$("#frmAgregarCliente").get(0).reset();
+								$("<div class='alert alert-success alert-dismissable'> Usuario agregado exitosamente </div>").appendTo("#alSusccess");
+								$("#mdRegistrarCliente").modal("hide");
+								setTimeout(function(){ $("#alSusccess").html("")}, 2000);
+							}
+							else{
+
+								// Revierto el formato de la fecha para que sea legible por el usuario
+								$("#id_fecha_nacimiento").val(FechaNacimiento);
+
+								/* Proceso de error */
+								$("#errNombreCliente").html("");
+								if (data.errors.nombre){
+									$("#errNombreCliente").html(data.errors.nombre);
+								}
+								$("#errApellidoCliente").html("");
+								if (data.errors.apellido){
+									$("#errApellidoCliente").html(data.errors.apellido);
+								}
+								$("#errDuiCliente").html("");
+								if (data.errors.dui){
+									$("#errDuiCliente").html(data.errors.dui);
+								}
+								$("#errGeneroCliente").html("");
+								if (data.errors.genero){
+									$("#errGeneroCliente").html(data.errors.genero);
+								}
+								$("#errFechaCliente").html("");
+								if (data.errors.fecha_nacimiento){
+									$("#errFechaCliente").html(data.errors.fecha_nacimiento);
+								}
+								$("#errTelefonoCliente").html("");
+								if (data.errors.telefono){
+									$("#errTelefonoCliente").html(data.errors.telefono);
+								}
+								$("#errCorreoECliente").html("");
+								if (data.errors.correo_electronico){
+									$("#errCorreoECliente").html(data.errors.correo_electronico);
+								}
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown){
+							alert(textStatus + " " +errorThrown);
+						},
+						processData: false,
+						contentType: false
+					});
+				});
+
+			});
+
+		</script>
+
+	</body>
+</html>

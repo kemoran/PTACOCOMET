@@ -1,0 +1,255 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> SISTEMA DE GESTIÓN DE TURNOS ACOCOMET DE R.L. </title>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title> SISTEMA DE GESTIÓN DE TURNOS ACOCOMET DE R.L. </title>
+		<!-- Tell the browser to be responsive to screen width -->
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<!-- Bootstrap 3.3.5 -->
+		<link rel="stylesheet" href="{% static 'AdminLTE/bootstrap/css/bootstrap.min.css' %}">
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+		<!-- Ionicons -->
+		<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+		<!-- PNotify -->
+		<link rel="stylesheet" href="{% static 'PNotify/pnotify.custom.min.css' %}">
+	</head>
+	<body style="padding: 10px;">
+		<div class="row">
+			<div class="col-md-4">
+				<div class="row">
+					<div class="col-md-12">
+						<!-- Información de ACOCOMET -->
+						<img class="img-responsive center-block" src="{% static 'SysWeb/ACOCOMET-thumbnail.PNG' %}"> <h1 class="text-center"> ACOCOMET DE R. L. </h1>
+						<h4> Observa en la pantalla tu número de ticket y la ventanilla o caja a la cual has sido asignado, en breves momentos te antenderemos </h4>
+					</div>
+					<div class="col-md-12">
+						<!-- Video -->
+						<div align="center" class="embed-responsive embed-responsive-16by9" id="vdPublicitario"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-md-12">
+						<!-- Tablas de asignaciones -->
+						<div class="row">
+							<div class="col-md-6">
+								<!-- Tabla de ventanillas -->
+								<h1> Atenci&oacute;n al cliente </h1>
+								<div class="table-responsive">
+									<table class="table" id="Ejecutivos">
+										<thead>
+											<tr>
+												<th> Escritorio </th>
+												<th> Ticket </th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for i in Ventanillas %}
+											<tr id="{{ i.id }}">
+												<td> {{ i.descripcion }} </td>
+												<td id="ticket">  </td>
+											</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<!-- Tabla de cajeros -->
+								<h1> Cajeros </h1>
+								<div class="table-responsive">
+									<table class="table" id="Cajeros">
+										<thead>
+											<tr>
+												<th> Caja </th>
+												<th> Ticket </th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for i in Cajeros %}
+											<tr id="{{ i.id }}">
+												<td> {{ i.descripcion }} </td>
+												<td id="ticket">  </td>
+											</tr>
+											{% endfor %}		
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div style="display: none;" id="DauVoz">
+			<audio id="auVoz"> <source src="{{ MEDIA_URL }}/Tono/Tono.mp3"> </audio>
+		</div>
+		<!-- jQuery 2.1.4 -->
+		<script src="{% static 'AdminLTE/plugins/jQuery/jQuery-2.1.4.min.js' %}"></script>
+		<!-- jQuery UI 1.11.4 -->
+		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+		<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+		<script>
+			$.widget.bridge('uibutton', $.ui.button);
+		</script>
+		<!-- Bootstrap 3.3.5 -->
+		<script src="{% static 'AdminLTE/bootstrap/js/bootstrap.min.js' %}"></script>
+		<!-- PNotify -->
+		<script type="text/javascript" src="{% static 'PNotify/pnotify.custom.min.js' %}"></script>
+		<!-- Servidor de Node.js -->
+		<script type="text/javascript" src="http://127.0.0.1:8008/socket.io/socket.io.js"></script> <!-- SERVIDOR LOCAL -->
+		<!--<script type="text/javascript" src="http://172.16.20.40:8008/socket.io/socket.io.js"></script>--> <!-- SERVIDOR DE PRODUCCIÓN -->
+
+		<script type="text/javascript">
+			//Variable para almacenar los audio para reproducir en la etiqueta audio
+			var auVoz = new Array();
+
+			/* Rutas de dirección del video */
+			var rutasVideos = [{% for i in iVideo %} "{{ MEDIA_URL }}{{ i.ruta }}", {% endfor %}];
+			// Variables para realizar la etiqueta video dinámica
+			var repActual = 0;
+			var repSiguiente = 0;
+			// Función de reproducción de varios videos
+			function sigVideo(){
+				repSiguiente = Math.floor((Math.random() * rutasVideos.length));
+				if(repSiguiente==repActual){
+					sigVideo();
+				}
+				else{
+					$("#vdPublicitario").html("");
+					$("#vdPublicitario").html("<video id='vid' autoplay class='img-responsive' onended='sigVideo()'> <source src='"+rutasVideos[repSiguiente]+"' type='video/webm'> </video>");
+					$("#vid").get(0).play();
+					repActual=repSiguiente;
+				}
+			}
+
+			//LLAMADA DE CLIENTE
+			function speak(text, callback) {
+				var u = new SpeechSynthesisUtterance();
+				u.text = text;
+				u.lang = 'es';
+				u.rate = 0.8;
+
+				u.onend = function () {
+					if (callback) {
+						callback();
+					}
+					$("#vid")[0].play();
+				};
+
+				u.onerror = function (e) {
+					if (callback) {
+						callback(e);
+					}
+				};
+				$("#vid")[0].pause();
+				speechSynthesis.speak(u);
+			}
+			//speak("Número de turno AT1, en la ventanilla 1");
+
+			$(document).ready(function(){
+				//Asignación del primer video publicitario
+				$("#vdPublicitario").html("<video id='vid' autoplay class='embed-responsive-item' onended='sigVideo()'> <source src='"+rutasVideos[0]+"' type='video/webm'> </video>");
+
+				/*
+				vdPublicitario
+				<source src="{{ MEDIA_URL }}{{ i.ruta_video }}" type="video/webm">
+				*/
+				var socket = io.connect("127.0.0.1:8008"); //SERVIDOR NODE LOCAL
+				//var socket = io.connect("http://172.16.20.40:8008"); //SERVIDOR NODE PRODUCCIÓN
+
+				var audioTagSupport = !!(document.createElement('audio').canPlayType);
+
+				socket.on("LlamarClienteRes", function(data){
+					PNotify.prototype.options.styling = "fontawesome";
+					data = eval("("+data+")");
+					$("#Ejecutivos").find("tr#"+data.id).html("<td>"+ data.descripcion +"</td> <td id+'"+ data.numeroTicket +"''> <strong> "+ data.numeroTicket +" </strong> </td>");
+
+					$("#Cajeros").find("tr#"+data.id).html("<td>"+ data.descripcion +"</td> <td id+'"+ data.numeroTicket +"''> <strong> "+ data.numeroTicket +" </strong> </td>");
+
+					/* Reproducción de audio */
+					//$("<source src='http://translate.google.com/translate_tts?tl=es&q="+encodeURIComponent("Número de turno,"+data.numeroTicket+", en el número de "+data.descripcion)+"'>").appendTo("#auVoz");
+					$("#vid")[0].pause();
+					$("#auVoz")[0].play();
+					$("#vid")[0].play();
+					if(data.numeroTicket.indexOf("C") == -1){ // Verifica que el ticket de que tip se a el ticket del mensaje
+						speak('Número de turno '+data.numeroTicket+', en la '+data.descripcion);
+						new PNotify({
+							title: "LLamada de cliente",
+							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en la <strong>"+data.descripcion+"</strong>",
+							type: "info",
+							icon: false,
+							animation: "fade",
+							animate_speed: "normal",
+							position_animate_speed: 500,
+							hide: true,
+							delay: 8000,
+							remove: true
+						});
+					}
+					else{
+						speak('Número de turno '+data.numeroTicket+', en el '+data.descripcion);
+						new PNotify({
+							title: "LLamada de cliente",
+							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en el <strong>"+data.descripcion+"</strong>",
+							type: "info",
+							icon: false,
+							animation: "fade",
+							animate_speed: "normal",
+							position_animate_speed: 500,
+							hide: true,
+							delay: 8000,
+							remove: true
+						});
+					}
+
+				});
+				
+				socket.on("RellamarClienteRes", function(data){
+					PNotify.prototype.options.styling = "fontawesome";
+					data = eval("("+data+")");
+					$("#vid")[0].pause();
+					$("#auVoz")[0].play();
+					$("#vid")[0].play();
+					if(data.numeroTicket.indexOf("C") == -1){ // Verifica que el ticket de que tip se a el ticket del mensaje
+						speak('Número de turno '+data.numeroTicket+', en la '+data.descripcion);
+						new PNotify({
+							title: "LLamada de cliente",
+							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en la <strong>"+data.descripcion+"</strong>",
+							type: "info",
+							icon: false,
+							animation: "fade",
+							animate_speed: "normal",
+							position_animate_speed: 500,
+							hide: true,
+							delay: 8000,
+							remove: true
+						});
+					}
+					else{
+						speak('Número de turno '+data.numeroTicket+', en el '+data.descripcion);
+						new PNotify({
+							title: "LLamada de cliente",
+							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en el <strong>"+data.descripcion+"</strong>",
+							type: "info",
+							icon: false,
+							animation: "fade",
+							animate_speed: "normal",
+							position_animate_speed: 500,
+							hide: true,
+							delay: 8000,
+							remove: true
+						});
+					}
+				});
+			});
+
+		</script>
+
+	</body>
+</html>

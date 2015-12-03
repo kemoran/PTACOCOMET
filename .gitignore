@@ -1,3 +1,5 @@
+#IGNORAR CARPETA DE ARCHIVOS MULTIMEDIAS DE VIDEOS
+/PTACOCOMET/media/VideosPublicitarios/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

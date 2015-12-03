@@ -1,0 +1,241 @@
+{% extends 'BaseSistemaWeb.html' %}
+
+{% block CSS %}
+{% endblock %}
+
+{% block Contenido %}
+			{% if user.is_staff %}
+			{% comment %} Administrador o gerente {% endcomment %}
+			<div class="row">
+				<div class="col-md-12">
+					<div class="callout callout-info">
+						<h4> Bienvenido al sistema de gestión de turnos </h4>
+						<p> Esta es el area administrativa del sistema </p>
+					</div>
+				</div>
+				<div class="col-md-12"><div id="alSuccess"></div></div>
+			</div>
+			{% else %}
+			{% comment %} Operario (Ejecutivo o Cajero) {% endcomment %}
+			<div class="row">
+				<div class="col-md-12">
+					<div class="box box-success">
+						<div class="box-header with-border"></div>
+						<form role="form">
+							<div class="box-body">
+								<div id="alSuccess"></div>
+								<h1> Atendiendo al ticket: </h1>
+								<h2 id="h2NumTicket"> {{ NumeroTicket }} </h2>
+							</div>
+							<div class="box-footer">
+								<button id="btnSiguiente" class="btn btn-primary" type="button"> Siguiente </button>
+								<button id="btnRellamada" class="btn btn-primary" type="button"> Rellamada </button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<!-- Modal evaluar servicio -->
+			<div class="modal fade" id="mdEvalServicio" tabindex="-1" role="dialog" aria-labelledby="mdEvalServicioLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"> <span aria-hidden="true">×</span></button>
+							<h4 class="modal-title"> Evaluación de servicio </h4>
+						</div>
+						<div class="modal-body">
+							<form class="form-horizontal" role="form" method="post" id="frmEvalServicio">
+								<div class="form-group">
+									<label> ¿Qu&eacute; le ha parecido el servicio? </label>
+									<br>
+									<label class="radio-inline">
+										{{ ifrmEncuesta.respuesta.0.tag }} Malo
+									</label>
+									<label class="radio-inline">
+										{{ ifrmEncuesta.respuesta.1.tag }} Bueno
+									</label>
+									<label class="radio-inline">
+										{{ ifrmEncuesta.respuesta.2.tag }} Muy bueno
+									</label>
+									<br>
+									<span class="text-danger" id="errEvaluacion"> </span>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button id="btnAnularTicket" class="btn btn-danger pull-left">
+								<span class="glyphicon glyphicon-remove"></span> Anular Ticket
+							</button>
+							<button id="btnEvaluar" class="btn btn-primary" value="">
+								<span class="glyphicon glyphicon-ok"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+{% endblock %}
+
+{% block JSli %}
+		{% if user.is_staff == 0 %}
+		<!-- Servidor de Node.js -->
+		<script type="text/javascript" src="http://127.0.0.1:8008/socket.io/socket.io.js"></script> <!-- SERVIDOR LOCAL -->
+		<!--<script type="text/javascript" src="http://172.16.20.40:8008/socket.io/socket.io.js"></script>--> <!-- SERVIDOR DE PRODUCCIÓN -->
+		{% endif %}
+{% endblock %}
+
+{% block JS %}
+		{% if user.is_staff == 0 %}
+		<script type="text/javascript">
+			$(document).ready(function(){
+				// Socket NodeJS
+				var socket = io.connect("127.0.0.1:8008"); //SERVIDOR NODE LOCAL
+				//var socket = io.connect("172.16.20.40:8008"); //SERVIDOR NODE PRODUCCIÓN
+				/*
+				$("#btnEvaluar").bind("submit", function(e){
+					e.preventDefault();
+				*/
+				$(document).on("click", "#btnEvaluar", function(e){
+					
+					var fdfrmEvalServicio = new FormData(document.getElementById("frmEvalServicio"));
+					$.ajax({
+						url: "{% url 'PasaTurnos.views.EvaluacionAjaxSistema' %}",
+						data: fdfrmEvalServicio,
+						type: "POST",
+						success: function(data){
+							if (data.success){
+								LlamarSiguiente(1);
+								$("#frmEvalServicio").get(0).reset();
+								$("#mdEvalServicio").modal("hide");
+							}else{
+								$("#errEvaluacion").html("");
+								if (data.errors.respuesta){
+									$("#errEvaluacion").html(data.errors.respuesta);
+								}
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown){
+							$("<div class='alert alert-success alert-dismissable'> "+ textStatus + " " +errorThrown +"</div>").appendTo("#alSuccess");
+							setTimeout(function(){ $("#alSuccess").html("")}, 2000);
+						},
+						processData: false,
+						contentType: false
+					});
+				});
+
+				// Modificar boton siguiente porque al inicio va la consulta a la encuesta
+				$("#btnSiguiente").click(function(){	
+					var Data = new FormData();
+					Data.append("user_id", "{{ user.id }}")
+					$.ajax({
+						url: "{% url 'PasaTurnos.views.VerificarTicketEncuestaAjaxSistema' %}",
+						data: Data,
+						type: "POST",
+						success: function(data){
+							if (data.success){
+								$("#mdEvalServicio").modal("show");
+							}
+							else{
+								LlamarSiguiente(1);
+								$("#frmEvalServicio").get(0).reset();
+								$("#mdEvalServicio").modal("hide");
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown){
+							$("<div class='alert alert-success alert-dismissable'> "+ textStatus + " " +errorThrown +"</div>").appendTo("#alSuccess");
+							setTimeout(function(){ $("#alSuccess").html("")}, 2000);
+						},
+						processData: false,
+						contentType: false
+					});
+				});
+
+				$("#btnRellamada").click(function(){
+					Rellamar();
+				});
+
+				$("#btnAnularTicket").click(function(){
+					LlamarSiguiente(0);
+					$("#frmEvalServicio").get(0).reset();
+					$("#mdEvalServicio").modal("hide");
+				});
+
+				function LlamarSiguiente(Estado){
+					var Data = new FormData();
+					Data.append("user_id", "{{ user.id }}")
+					if(Estado == 1){
+						Data.append("Estado", "A")
+					}else{
+						Data.append("Estado", "N")
+					}
+					$.ajax({
+						url: "{% url 'PasaTurnos.views.LlamarNuevoTicketAjaxSistema' %}",
+						data: Data,
+						type: "POST",
+						success: function(data){
+							/* Exito en ajax */
+							if (data.success){
+								$("#h2NumTicket").html("");
+								$("#h2NumTicket").html(data.numeroTicket);
+								$("<div class='alert alert-success alert-dismissable'> Ticket "+data.numeroTicket+" asignado exitosamente </div>").appendTo("#alSuccess");
+								setTimeout(function(){ $("#alSuccess").html("")}, 2000);
+
+								/* WebSocket */
+								var DataSocket = {};
+								DataSocket.user_id = {{ user.id }};
+								DataSocket.numeroTicket = data.numeroTicket;
+								socket.emit("LlamarCliente", DataSocket);
+
+							}
+							else{
+								$("<div class='alert alert-success alert-dismissable'> "+ data.errors +"</div>").appendTo("#alSuccess");
+								setTimeout(function(){ $("#alSuccess").html("")}, 2000);
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown){
+							/* Error en ajax */
+							$("<div class='alert alert-success alert-dismissable'> "+ textStatus + " " +errorThrown +"</div>").appendTo("#alSuccess");
+							setTimeout(function(){ $("#alSuccess").html("")}, 2000);
+						},
+						processData: false,
+						contentType: false
+					});
+				}
+
+				function Rellamar(){
+					var Data = new FormData();
+					Data.append("user_id", "{{ user.id }}")
+					$.ajax({
+						url: "{% url 'PasaTurnos.views.RellamarNuevoTicketAjaxSistema' %}",
+						data: Data,
+						type: "POST",
+						success: function(data){
+							if(data.success){
+								$("<div class='alert alert-success alert-dismissable'> Ticket "+data.numeroTicket+" rellamado exitosamente </div>").appendTo("#alSuccess");
+								setTimeout(function(){ $("#alSuccess").html("")}, 2000);
+
+								/* WebSocket */
+								var DataSocket = {};
+								DataSocket.user_id = {{ user.id }};
+								DataSocket.numeroTicket = data.numeroTicket;
+								socket.emit("RellamarCliente", DataSocket);
+							}
+							else{
+								$("<div class='alert alert-success alert-dismissable'> "+ data.errors +"</div>").appendTo("#alSuccess");
+								setTimeout(function(){ $("#alSuccess").html("")}, 2000);
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown){
+							/* Error en ajax */
+							$("<div class='alert alert-success alert-dismissable'> "+ textStatus + " " +errorThrown +"</div>").appendTo("#alSuccess");
+							setTimeout(function(){ $("#alSuccess").html("")}, 2000);
+						},
+						processData: false,
+						contentType: false
+					});
+				}
+
+			});
+		</script>
+		{% endif %}
+{% endblock %}

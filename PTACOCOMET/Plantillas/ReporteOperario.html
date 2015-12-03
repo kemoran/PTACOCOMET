@@ -1,0 +1,217 @@
+{% extends 'BaseSistemaWeb.html' %}
+{% load staticfiles %}
+
+{% block CSS %}
+		<!-- DataTables -->
+		<link rel="stylesheet" href="{% static 'AdminLTE/plugins/datatables/dataTables.bootstrap.css' %}">
+{% endblock %}
+
+{% block Contenido %}
+					<div class="row">
+						<div class="col-md-12">
+							<div class="box box-success">
+								<div class="box-header with-border">
+									<h3> Resultados de estadísticas por operario </h3>
+									<form class="form-inline" role="form" method="post" enctype="multipart/form-data">
+										<div class="form-group">
+											<label class=""> Fecha de inicio </label>
+											<div class="input-group date" id="dfInicio">
+												<input class="form-control" type="text" readonly="readonly" placeholder="dd/mm/aa" name="fInicio" id="fInicio">
+												<span class="input-group-addon">
+												<span class="glyphicon glyphicon-calendar">
+											</div>
+										</div>
+										<div class="form-group">
+											<label class=""> Fecha de finalizaci&oacute;n </label>
+											<div class="input-group date" id="dfFin">
+												<input class="form-control" type="text" readonly="readonly" placeholder="dd/mm/aa" name="fFin" id="fFin">
+												<span class="input-group-addon">
+												<span class="glyphicon glyphicon-calendar">
+											</div>
+										</div>
+										<!-- Div para imprimir el error -->
+										<div class="form-group" id="err"></div>
+										<div class="form-group pull-right">
+											<button class="btn btn-primary" id="btnGenerar" type="button"> Generar </button>
+										</div>
+									</form>
+
+								</div>
+								<div class="box-body">
+									<div class="row">
+										<div class="col-md-9">
+											<div class="chart">
+												<canvas id="barChart" style="height:230px"></canvas>
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div id="tblResultados"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Modal Eliminar -->
+					<div class="modal fade fade bs-example-modal-sm" id="mdEliminar" tabindex="-1" role="dialog" aria-labelledby="ModalEliminar" aria-hidden="true">
+						<div class="modal-dialog modal-sm">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+									<h4 class="modal-title" id="ModalEliminar">
+										<span class="glyphicon glyphicon-warning-sign"></span> Alerta
+									</h4>
+								</div>
+								<div class="modal-body">
+									<h4> ¿Seguro que desea eliminar? </h4>
+								</div>
+								<div class="modal-footer">
+									<!-- <button type="button" class="btn btn-default" data-dismiss="modal"> No </button> -->
+									<a id="mdEliminarbtnSi" class="btn btn-danger" href="#"> <!-- Si --> <span class="glyphicon glyphicon-ok"></span> </a>
+								</div>
+							</div>
+						</div>
+					</div>
+{% endblock %}
+
+{% block JSli %}
+		<!-- ChartJS 1.0.1 -->
+		<script src="{% static 'AdminLTE/plugins/chartjs/Chart.min.js' %}"></script>
+		<!-- FastClick -->
+		<script src="{% static 'AdminLTE/plugins/fastclick/fastclick.min.js' %}"></script>
+{% endblock %}
+
+{% block JS %}
+		<script type="text/javascript">
+			$(document).ready(function(){
+				/* Datepicker */
+				$("#dfInicio").datepicker({
+					format: "dd/mm/yyyy",
+					pickTime: false,
+					language: "es",
+					showToday: true
+				});
+
+				$("#dfFin").datepicker({
+					format: "dd/mm/yyyy",
+					pickTime: false,
+					language: "es",
+					showToday: true
+				});
+
+				$("#btnGenerar").click(function(){
+					//$("#chart").html('<canvas id="barChart" style="height:230px"></canvas>');
+					var Data = new FormData();
+					Data.append("fInicio", $("#fInicio").val().split("/").reverse().join("-"));
+					Data.append("fFin", $("#fFin").val().split("/").reverse().join("-"));
+
+					$.ajax({
+						url: "{% url 'PasaTurnos.views.GenerarReporteOperario' %}",
+						data: Data,
+						type: "POST",
+						success: function(data){
+							if(data.success){
+								var Etiquetas = new Array();
+								var Atendidos = new Array();
+								var Nulos = new Array();
+								var tabla = '<table class="table"><thead><tr><th>Operario</th><th>Atendidos</th><th>Anulados</th></tr></thead><tbody>';
+								//CONVERSIÓN DE RESULTADO EN FORMATO PARA GENERACIÓN DE GRAFICO
+								for(i=0;i<data.iOperario.length; i++){
+									tabla = tabla+'<tr><td>'+data.iOperario[i].Operario+'</td><td>'+data.iOperario[i].Atendidos+'</td><td>'+data.iOperario[i].Nulos+'</td><tr>';
+									Etiquetas[i] = data.iOperario[i].Operario;
+									Atendidos[i] = data.iOperario[i].Atendidos;
+									Nulos[i] = data.iOperario[i].Nulos;
+								}
+								tabla = tabla+'</tbody></table>';
+								$("#tblResultados").html(tabla);
+								var areaChartData = {
+									labels: Etiquetas,
+									datasets: [
+										{
+											label: "Atendidos",
+											fillColor: "rgba(60,141,188,0.9)",
+											strokeColor: "rgba(60,141,188,0.8)",
+											pointColor: "#3b8bba",
+											pointStrokeColor: "rgba(60,141,188,1)",
+											pointHighlightFill: "#fff",
+											pointHighlightStroke: "rgba(60,141,188,1)",
+											data: Atendidos
+										}
+										,{
+											label: "Anulados",
+											fillColor: "rgba(210, 214, 222, 1)",
+											strokeColor: "rgba(210, 214, 222, 1)",
+											pointColor: "rgba(210, 214, 222, 1)",
+											pointStrokeColor: "#c1c7d1",
+											pointHighlightFill: "#fff",
+											pointHighlightStroke: "rgba(220,220,220,1)",
+											data: Nulos
+										}
+									]
+								};
+								//-------------
+								//- BAR CHART -
+								//-------------
+								var barChartCanvas = $("#barChart").get(0).getContext("2d");
+								var barChart = new Chart(barChartCanvas);
+								var barChartData = areaChartData;
+								barChartData.datasets[1].fillColor = "#00a65a";
+								barChartData.datasets[1].strokeColor = "#00a65a";
+								barChartData.datasets[1].pointColor = "#00a65a";
+								var barChartOptions = {
+									//Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
+									scaleBeginAtZero: true,
+									//Boolean - Whether grid lines are shown across the chart
+									scaleShowGridLines: true,
+									//String - Colour of the grid lines
+									scaleGridLineColor: "rgba(0,0,0,.05)",
+									//Number - Width of the grid lines
+									scaleGridLineWidth: 1,
+									//Boolean - Whether to show horizontal lines (except X axis)
+									scaleShowHorizontalLines: true,
+									//Boolean - Whether to show vertical lines (except Y axis)
+									scaleShowVerticalLines: true,
+									//Boolean - If there is a stroke on each bar
+									barShowStroke: true,
+									//Number - Pixel width of the bar stroke
+									barStrokeWidth: 2,
+									//Number - Spacing between each of the X value sets
+									barValueSpacing: 5,
+									//Number - Spacing between data sets within X values
+									barDatasetSpacing: 1,
+									//String - A legend template
+									{% comment %} legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>", {% endcomment %}
+									//Boolean - whether to make the chart responsive
+									responsive: true,
+									maintainAspectRatio: true
+								};
+
+								barChartOptions.datasetFill = false;
+								barChart.Bar(barChartData, barChartOptions);
+								//$("<br><button class='btn btn-primary' id='btnImprimir'> Imprimir </button>").appendTo("#rpGrafico");
+
+							}
+							else{
+								$("<div class='alert alert-danger alert-dismissable'> "+ data.errors +"</div>").appendTo("#err");
+								setTimeout(function(){ $("#err").html("")}, 2000);
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown){
+							alert(textStatus + " " +errorThrown);
+						},
+						processData: false,
+						contentType: false
+					});
+
+				});
+				
+				$("#btnImprimir").click(function(){
+					//var Imagen = $("chart1").jqplotToImageElem();
+					//var Imagen = Grafico.jqplotToImageElem();
+					//var imgSrc = Imagen.src;
+					//open(imgSrc);
+				});
+
+			});
+		</script>
+{% endblock %}

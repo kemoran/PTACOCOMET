@@ -1,0 +1,28 @@
+{% extends 'BaseSistemaWeb.html' %}
+
+{% block CSS %}
+{% endblock %}
+
+{% block Contenido %}
+					<div class="row">
+						<div class="col-md-12">
+							<div class="box box-success">
+								<div class="box-header with-border"> <h3>  </h3> </div>
+								<form role="form">
+									<div class="box-body">
+										<div id="alSuccess"></div>
+										<h1> Atendiendo al ticket: </h1>
+										<h2 id="h2NumTicket"> {{ NumeroTicket }} </h2>
+									</div>
+									<div class="box-footer">
+										<button id="btnSiguiente" class="btn btn-primary" type="button"> Siguiente </button>
+										<button id="btnRellamada" class="btn btn-primary" type="button"> Rellamada </button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+{% endblock %}
+
+{% block JSli %}
+{% endblock %}
