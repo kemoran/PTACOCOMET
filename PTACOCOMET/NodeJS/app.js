@@ -10,8 +10,8 @@ io.sockets.on("connection", function(socket){
 		var values = querystring.stringify(data);
 		var options = {
 			hostname: "localhost",
-			//port: "80",
-			port: "8000",
+			port: "80",
+			//port: "8000",
 			path: "/NodeJS/LlamarCliente/",
 			method: "POST",
 			headers: {
@@ -33,8 +33,8 @@ io.sockets.on("connection", function(socket){
 		var values = querystring.stringify(data);
 		var options = {
 			hostname: "localhost",
-			//port: "80",
-			port: "8000",
+			port: "80",
+			//port: "8000",
 			path: "/NodeJS/RellamarCliente/",
 			method: "POST",
 			headers: {

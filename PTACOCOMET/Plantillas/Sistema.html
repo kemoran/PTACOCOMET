@@ -79,8 +79,8 @@
 {% block JSli %}
 		{% if user.is_staff == 0 %}
 		<!-- Servidor de Node.js -->
-		<script type="text/javascript" src="http://127.0.0.1:8008/socket.io/socket.io.js"></script> <!-- SERVIDOR LOCAL -->
-		<!--<script type="text/javascript" src="http://172.16.20.40:8008/socket.io/socket.io.js"></script>--> <!-- SERVIDOR DE PRODUCCIÓN -->
+		<!-- <script type="text/javascript" src="http://127.0.0.1:8008/socket.io/socket.io.js"></script> --> <!-- SERVIDOR LOCAL -->
+		<script type="text/javascript" src="http://172.16.20.40:8008/socket.io/socket.io.js"></script> <!-- SERVIDOR DE PRODUCCIÓN -->
 		{% endif %}
 {% endblock %}
 
@@ -89,8 +89,8 @@
 		<script type="text/javascript">
 			$(document).ready(function(){
 				// Socket NodeJS
-				var socket = io.connect("127.0.0.1:8008"); //SERVIDOR NODE LOCAL
-				//var socket = io.connect("172.16.20.40:8008"); //SERVIDOR NODE PRODUCCIÓN
+				//var socket = io.connect("127.0.0.1:8008"); //SERVIDOR NODE LOCAL
+				var socket = io.connect("172.16.20.40:8008"); //SERVIDOR NODE PRODUCCIÓN
 				/*
 				$("#btnEvaluar").bind("submit", function(e){
 					e.preventDefault();
