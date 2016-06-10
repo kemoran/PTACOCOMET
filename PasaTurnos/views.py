@@ -560,7 +560,7 @@ def GeneradordeTicket(request, servicio_id, dui):
 		print str(datetime.date(datetime.now()))
 		Total = Ticket.objects.extra(select={'Total':'COUNT(*)'}, where={"fecha_emicion >= '"+str(datetime.date(datetime.now()))+" 00:00:00'"}).exclude(servicio_id__in=idServicios).values('Total')
 		#numTicket = 'C' + str(Ticket.objects.exclude(id_servicio__in=idServicios).filter(fecha_emicion__gte=''+str(datetime.date(datetime.now()))+'').count()+1)
-		numTicket = 'C' + str(Total[0]['Total']+1)
+		numTicket = 'V' + str(Total[0]['Total']+1)
 	else:
 		Servicios = Servicio.objects.exclude(tipo_atencion_id__descripcion='Atencion al cliente').values('id')
 		for i in range(len(Servicios)):

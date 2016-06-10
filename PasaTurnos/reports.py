@@ -28,7 +28,7 @@ class rpTicket(Report):
 			SystemField(expression='%(report_title)s', top=0.1*cm, left=0, width=BAND_WIDTH,
 				style={'fontName': 'Helvetica-Bold', 'fontSize': 14, 'alignment': TA_CENTER}
 				),
-			Label(text='Tu cooperativa amiga', top=0.8*cm, left=0, width=BAND_WIDTH,
+			Label(text='Cooperatíva Financiera Única', top=0.8*cm, left=0, width=BAND_WIDTH,
 				style={'fontName': 'Helvetica-Bold', 'fontSize': 10, 'alignment': TA_CENTER}
 				),
 		]
@@ -37,7 +37,7 @@ class rpTicket(Report):
 	# Cuerpo del reporte
 	class band_detail(ReportBand):
 		elements = [
-			Label(text='¡Hola!', top=0.4*cm, left=0, width=BAND_WIDTH,
+			Label(text='¡Bienvenido!', top=0.4*cm, left=0, width=BAND_WIDTH,
 				style={'fontName': 'Helvetica-Bold', 'fontSize': 9, 'alignment': TA_CENTER}
 				),
 			ObjectValue(attribute_name='nombre', top=1.0*cm, left=0, width=BAND_WIDTH,
