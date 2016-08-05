@@ -11,7 +11,7 @@ from geraldo import Report, ReportBand, Label, ObjectValue, SystemField, BAND_WI
 class rpTicket(Report):
 	title = 'ACOCOMET de R.L.'
 	author = 'ACOCOMET de R.L.'
-	page_size = 7.8*cm,5.5*cm
+	page_size = 7.8*cm,7*cm
 	margin_left = 0.5*cm
 	margin_top = 0.5*cm
 	margin_right = 0.5*cm
@@ -33,6 +33,19 @@ class rpTicket(Report):
 				),
 		]
 		borders = {'bottom': True}
+
+	# Pie del reporte
+	class band_page_footer(ReportBand):
+		height = 1.3*cm
+		elements = [
+			Label(text='¿Qué le ha parecido el servicio?', top=0.1*cm, left=0, width=BAND_WIDTH,
+				style={'fontName': 'Helvetica-Bold', 'fontSize': 10, 'alignment': TA_CENTER}
+				),
+			Label(text='(&nbsp;&nbsp;&nbsp;)&nbsp;Malo &nbsp;&nbsp;&nbsp; (&nbsp;&nbsp;&nbsp;)&nbsp;Bueno &nbsp;&nbsp;&nbsp; (&nbsp;&nbsp;&nbsp;)&nbsp;Muy bueno', top=0.8*cm, left=0, width=BAND_WIDTH,
+				style={'fontName': 'Helvetica', 'fontSize': 10, 'alignment': TA_CENTER}
+				),
+		]
+		borders = {'top': True}
 
 	# Cuerpo del reporte
 	class band_detail(ReportBand):
