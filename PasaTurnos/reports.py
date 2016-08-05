@@ -37,7 +37,7 @@ class rpTicket(Report):
 	# Cuerpo del reporte
 	class band_detail(ReportBand):
 		elements = [
-			Label(text='¡Bienvenido!', top=0.4*cm, left=0, width=BAND_WIDTH,
+			Label(text='¡Gracias por visitarnos!', top=0.4*cm, left=0, width=BAND_WIDTH,
 				style={'fontName': 'Helvetica-Bold', 'fontSize': 9, 'alignment': TA_CENTER}
 				),
 			ObjectValue(attribute_name='nombre', top=1.0*cm, left=0, width=BAND_WIDTH,
