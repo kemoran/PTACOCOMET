@@ -137,7 +137,7 @@
 				} catch (e) {}
 				return null;
 			};
-			
+
 			function speak(text, callback) {
 				var u = new SpeechSynthesisUtterance();
 				u.text = text;
@@ -187,7 +187,7 @@
 					$("#auVoz")[0].play();
 					$("#vid")[0].play();
 					if(data.numeroTicket.indexOf("C") == -1){ // Verifica que el ticket de que tip se a el ticket del mensaje
-						speak('Número de turno '+data.numeroTicket+', en la '+data.descripcion);
+						//speak('Número de turno '+data.numeroTicket+', en la '+data.descripcion);
 						new PNotify({
 							title: "LLamada de cliente",
 							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en la <strong>"+data.descripcion+"</strong>",
@@ -202,7 +202,7 @@
 						});
 					}
 					else{
-						speak('Número de turno '+data.numeroTicket+', en el '+data.descripcion);
+						//speak('Número de turno '+data.numeroTicket+', en el '+data.descripcion);
 						new PNotify({
 							title: "LLamada de cliente",
 							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en el <strong>"+data.descripcion+"</strong>",
@@ -226,7 +226,7 @@
 					$("#auVoz")[0].play();
 					$("#vid")[0].play();
 					if(data.numeroTicket.indexOf("C") == -1){ // Verifica que el ticket de que tip se a el ticket del mensaje
-						speak('Número de turno '+data.numeroTicket+', en la '+data.descripcion);
+						//speak('Número de turno '+data.numeroTicket+', en la '+data.descripcion);
 						new PNotify({
 							title: "LLamada de cliente",
 							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en la <strong>"+data.descripcion+"</strong>",
@@ -241,7 +241,7 @@
 						});
 					}
 					else{
-						speak('Número de turno '+data.numeroTicket+', en el '+data.descripcion);
+						//speak('Número de turno '+data.numeroTicket+', en el '+data.descripcion);
 						new PNotify({
 							title: "LLamada de cliente",
 							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en el <strong>"+data.descripcion+"</strong>",
