@@ -129,10 +129,19 @@
 			}
 
 			//LLAMADA DE CLIENTE
+			findLocaleCode=function(lang) {
+				var voices=window.speechSynthesis.getVoices();
+				for (var i=0, len=voices.length; i<len; i++) try {
+					var voice=voices[i];
+					if (voice.lang.indexOf(lang)==0) return voice.lang;
+				} catch (e) {}
+				return null;
+			};
+			
 			function speak(text, callback) {
 				var u = new SpeechSynthesisUtterance();
 				u.text = text;
-				u.lang = 'es';
+				u.lang = findLocaleCode("es");
 				u.rate = 0.8;
 
 				u.onend = function () {
