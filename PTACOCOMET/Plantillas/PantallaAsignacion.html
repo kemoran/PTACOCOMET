@@ -18,7 +18,51 @@
 		<link rel="stylesheet" href="{% static 'PNotify/pnotify.custom.min.css' %}">
 	</head>
 	<body style="padding: 10px;">
-		<div class="row">
+		<table style="width: 100%">
+			<tr>
+				<td style="width: 20%;">
+					<img class="img-responsive center-block" src="{% static 'SysWeb/ACOCOMET-thumbnail.PNG' %}"> <h1 class="text-center"> ACOCOMET DE R. L. </h1>
+					<h4> Observa en la pantalla tu número de ticket y la ventanilla o caja a la cual has sido asignado, en breves momentos te antenderemos </h4>
+					<!-- Video -->
+					<div align="center" class="embed-responsive embed-responsive-16by9" id="vdPublicitario"></div>
+					<div style="width:300px;vertical-align:top;font-family: Arial;font-size:9pt;line-height: normal">
+							<a rel="license" href="//responsivevoice.org/">
+								<img title="ResponsiveVoice Text To Speech" src="https://responsivevoice.org/wp-content/uploads/2014/08/120x31.png" style="float:left;padding-right:2px" />
+							</a>
+							<span xmlns:dct="https://purl.org/dc/terms/" property="dct:title">
+								<a href="//responsivevoice.org/" target="_blank" title="ResponsiveVoice Text To Speech">
+									ResponsiveVoice
+								</a>
+							</span>
+							used under
+							<a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" title="Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License">
+								Non-Commercial License
+							</a>
+						</div>
+						<div style="clear:both;">&nbsp;</div>
+				</td>
+				<td style="width: 80%;" valign="top">
+					<h1 style="text-align: center;"> Cajas en atención </h1>
+					<table style="width: 100%; border: 1px solid #f4f4f4; font-size: 25px; text-align: center;" id="Cajeros" border="1">
+						<thead>
+							<tr>
+								<th style="width: 50%; text-align: center;"> Caja </th>
+								<th style="width: 50%; text-align: center;"> Ticket </th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for i in Cajeros %}
+							<tr id="{{ i.id }}">
+								<td> {{ i.descripcion }} </td>
+								<td id="ticket">  </td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+		{% comment %} <div class="row">
 			<div class="col-md-4">
 				<div class="row">
 					<div class="col-md-12">
@@ -29,6 +73,25 @@
 					<div class="col-md-12">
 						<!-- Video -->
 						<div align="center" class="embed-responsive embed-responsive-16by9" id="vdPublicitario"></div>
+					</div>
+					<div class="col-md-12">
+						
+						<div style="width:300px;vertical-align:top;font-family: Arial;font-size:9pt;line-height: normal">
+							<a rel="license" href="//responsivevoice.org/">
+								<img title="ResponsiveVoice Text To Speech" src="https://responsivevoice.org/wp-content/uploads/2014/08/120x31.png" style="float:left;padding-right:2px" />
+							</a>
+							<span xmlns:dct="https://purl.org/dc/terms/" property="dct:title">
+								<a href="//responsivevoice.org/" target="_blank" title="ResponsiveVoice Text To Speech">
+									ResponsiveVoice
+								</a>
+							</span>
+							used under
+							<a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" title="Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License">
+								Non-Commercial License
+							</a>
+						</div>
+						<div style="clear:both;">&nbsp;</div>
+
 					</div>
 				</div>
 			</div>
@@ -76,7 +139,7 @@
 												<td> {{ i.descripcion }} </td>
 												<td id="ticket">  </td>
 											</tr>
-											{% endfor %}		
+											{% endfor %}
 										</tbody>
 									</table>
 								</div>
@@ -85,7 +148,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> {% endcomment %}
 		<div style="display: none;" id="DauVoz">
 			<audio id="auVoz"> <source src="{{ MEDIA_URL }}/Tono/Tono.mp3"> </audio>
 		</div>
@@ -104,6 +167,8 @@
 		<!-- Servidor de Node.js -->
 		<!-- <script type="text/javascript" src="http://127.0.0.1:8008/socket.io/socket.io.js"></script> --> <!-- SERVIDOR LOCAL -->
 		<script type="text/javascript" src="http://172.16.20.40:8008/socket.io/socket.io.js"></script> <!-- SERVIDOR DE PRODUCCIÓN -->
+		<!-- ResponsiveVoice.JS -->
+		<script src='https://code.responsivevoice.org/responsivevoice.js'></script>
 
 		<script type="text/javascript">
 			//Variable para almacenar los audio para reproducir en la etiqueta audio
@@ -188,6 +253,7 @@
 					$("#vid")[0].play();
 					if(data.numeroTicket.indexOf("C") == -1){ // Verifica que el ticket de que tip se a el ticket del mensaje
 						//speak('Número de turno '+data.numeroTicket+', en la '+data.descripcion);
+						responsiveVoice.speak("Número de turno "+data.numeroTicket+", en la "+data.descripcion, "Spanish Latin American Female");
 						new PNotify({
 							title: "LLamada de cliente",
 							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en la <strong>"+data.descripcion+"</strong>",
@@ -203,6 +269,7 @@
 					}
 					else{
 						//speak('Número de turno '+data.numeroTicket+', en el '+data.descripcion);
+						responsiveVoice.speak("Número de turno "+data.numeroTicket+", en el "+data.descripcion, "Spanish Latin American Female");
 						new PNotify({
 							title: "LLamada de cliente",
 							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en el <strong>"+data.descripcion+"</strong>",
@@ -227,6 +294,7 @@
 					$("#vid")[0].play();
 					if(data.numeroTicket.indexOf("C") == -1){ // Verifica que el ticket de que tip se a el ticket del mensaje
 						//speak('Número de turno '+data.numeroTicket+', en la '+data.descripcion);
+						responsiveVoice.speak("Número de turno "+data.numeroTicket+", en la "+data.descripcion, "Spanish Latin American Female");
 						new PNotify({
 							title: "LLamada de cliente",
 							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en la <strong>"+data.descripcion+"</strong>",
@@ -242,6 +310,7 @@
 					}
 					else{
 						//speak('Número de turno '+data.numeroTicket+', en el '+data.descripcion);
+						responsiveVoice.speak("Número de turno "+data.numeroTicket+", en el "+data.descripcion, "Spanish Latin American Female");
 						new PNotify({
 							title: "LLamada de cliente",
 							text: "Número de turno <strong>"+data.numeroTicket+"</strong> en el <strong>"+data.descripcion+"</strong>",
